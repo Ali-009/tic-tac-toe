@@ -34,17 +34,18 @@ let gameBoard = (function(){
     }
   }
 
+
   function updateBoard(e){
 
     if(e.target.textContent){
       return;
     }
 
-    if(gameBoardArray.length % 2 === 0){
-      gameBoardArray.push('x');
+    if(gameBoard.gameBoardArray.length % 2 === 0){
+      gameBoard.gameBoardArray.push('x');
       e.target.textContent = 'X';
     } else{
-      gameBoardArray.push('o');
+      gameBoard.gameBoardArray.push('o');
       e.target.textContent = 'O';
     }
   }

@@ -23,4 +23,8 @@
   border: thin solid black;
   border-top: none;
   border-right: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

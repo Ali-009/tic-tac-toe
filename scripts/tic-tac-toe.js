@@ -4,14 +4,17 @@ function Players(name){
   return {name, score};
 }
 
-//A module that contains the gameBoardArray, can create a board, and can update it
+let player1;
+let player2;
+
+//A module that contains the state, can create a board, and can update it
 let gameBoard = (function(){
-  let gameBoardArray = [];
+  let state = [];
 
   function createBoard(){
 
-    //resetting gameBoardArray
-    gameBoardArray = [];
+    //resetting state
+    gameBoard.state = [];
 
     let wrapper = document.querySelector('#wrapper');
     let board = document.createElement('div');
@@ -22,6 +25,8 @@ let gameBoard = (function(){
     for(let i = 0; i < 9; i++){
       let boardCell = document.createElement('div');
       boardCell.classList.add('board-cell');
+      boardCell.setAttribute('id', `cell-${i}`);
+
       board.appendChild(boardCell);
       if(i === 0 || i === 3 || i === 6){
         boardCell.style.borderLeft = 'none';
@@ -30,31 +35,76 @@ let gameBoard = (function(){
         boardCell.style.borderBottom = 'none';
       }
 
-      boardCell.addEventListener('click', updateBoard);
+      boardCell.addEventListener('click', _updateBoard);
     }
   }
 
 
-  function updateBoard(e){
+  function _updateBoard(e){
 
     if(e.target.textContent){
       return;
     }
 
-    if(gameBoard.gameBoardArray.length % 2 === 0){
-      gameBoard.gameBoardArray.push('x');
+    cellID = e.target.getAttribute('id');
+    cellIndex = cellID.slice(5);
+
+    //deciding turn based on how many cells were actually filled
+    if(gameBoard.state.filter(cell => cell).length % 2 === 0){
+      gameBoard.state[cellIndex] = 'x';
       e.target.textContent = 'X';
     } else{
-      gameBoard.gameBoardArray.push('o');
+      gameBoard.state[cellIndex] = 'o';
       e.target.textContent = 'O';
     }
+
+    gameFlow.checkWinner(gameBoard.state);
+
   }
 
-  return{gameBoardArray, createBoard};
+  return{state, createBoard};
+})();
+
+//working on gameFlow module
+let gameFlow = (function(){
+
+  function checkWinner(boardState){
+
+    //horizontal lines
+    for(let i = 0; i < 9; i = i + 3){
+      if(boardState[i] === boardState[i + 1] &&
+        boardState[i] === boardState[i + 2]){
+          if(boardState[i]){
+            console.log('we have a winner');
+          }
+      }
+    }
+    //vertical lines
+    for(let i = 0; i < 3; i++){
+      if(boardState[i] === boardState[i+3] &&
+        boardState[i] === boardState[i+6]){
+        if(boardState[i]){
+          console.log('we have a winner');
+        }
+      }
+    }
+    //diagonal lines
+    if(boardState[0]){
+      if(boardState[0] === boardState[4] && boardState[0] === boardState[8]){
+        console.log('we have a winner');
+      }
+    }else if(boardState[2]){
+      if(boardState[2] === boardState[4] && boardState[2] === boardState[6]){
+        console.log('we have a winner');
+      }
+    }
+  }
+  return {checkWinner};
+
 })();
 
 
-//Initialize Game
+//Starting screen
 function startGame(){
 
   let twoPlayerButton = document.querySelector('#two-player-button');

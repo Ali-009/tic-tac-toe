@@ -42,7 +42,7 @@ let gameBoard = (function(){
 
   function _updateBoard(e){
 
-    if(e.target.textContent){
+    if(e.target.textContent || gameFlow.gameOver){
       return;
     }
 
@@ -68,38 +68,54 @@ let gameBoard = (function(){
 //working on gameFlow module
 let gameFlow = (function(){
 
+  let gameOver;
+
   function checkWinner(boardState){
 
     //horizontal lines
     for(let i = 0; i < 9; i = i + 3){
-      if(boardState[i] === boardState[i + 1] &&
-        boardState[i] === boardState[i + 2]){
-          if(boardState[i]){
-            console.log('we have a winner');
-          }
+      if(boardState[i]){
+        if(boardState[i] === boardState[i + 1] &&
+          boardState[i] === boardState[i + 2]){
+            _stopGame(i, i+1, i+2);
+        }
       }
     }
     //vertical lines
     for(let i = 0; i < 3; i++){
-      if(boardState[i] === boardState[i+3] &&
-        boardState[i] === boardState[i+6]){
-        if(boardState[i]){
-          console.log('we have a winner');
+      if(boardState[i]){
+        if(boardState[i] === boardState[i+3] &&
+          boardState[i] === boardState[i+6]){
+            _stopGame(i, i+3, i+6);
         }
       }
     }
     //diagonal lines
     if(boardState[0]){
       if(boardState[0] === boardState[4] && boardState[0] === boardState[8]){
-        console.log('we have a winner');
+        _stopGame(0, 4, 8);
       }
     }else if(boardState[2]){
       if(boardState[2] === boardState[4] && boardState[2] === boardState[6]){
-        console.log('we have a winner');
+        _stopGame(2, 4, 6);
       }
     }
   }
-  return {checkWinner};
+
+  function _stopGame(...cellIndex){
+
+    console.log('we have a winner');
+
+    //coloring cells
+    for(let i = 0; i < 3; i++){
+      let cell = document.querySelector(`#cell-${cellIndex[i]}`);
+      cell.style.color = 'red';
+    }
+
+    gameFlow.gameOver = true;
+
+  }
+  return {checkWinner, gameOver};
 
 })();
 
@@ -119,6 +135,7 @@ function initGame(e){
 
     if(document.querySelector('#board')){
       document.querySelector('#board').remove();
+      gameFlow.gameOver = false;
     }
     gameBoard.createBoard();
 }

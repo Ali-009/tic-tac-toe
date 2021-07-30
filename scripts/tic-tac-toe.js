@@ -106,6 +106,28 @@ let gameFlow = (function(){
 
     console.log('we have a winner');
 
+    let wrapper = document.querySelector('#wrapper');
+    let winnerText = document.createElement('div');
+
+    //Adding winner text based on who won
+    if(gameBoard.state[cellIndex[0]] === 'x'){
+      winnerText.textContent = `Congrats ${player1.name}`;
+      player1.score++;
+    }else {
+      winnerText.textContent = `Congrats ${player2.name}`;
+      player2.score++;
+    }
+
+    winnerText.setAttribute('id', 'winner-text');
+    wrapper.appendChild(winnerText);
+
+    //mentioning current score
+    let scoreText = document.createElement('div');
+    scoreText.textContent = `${player1.name} : ${player1.score}
+    \n ${player2.name} : ${player2.score}`;
+
+    wrapper.appendChild(scoreText);
+
     //coloring cells
     for(let i = 0; i < 3; i++){
       let cell = document.querySelector(`#cell-${cellIndex[i]}`);
@@ -136,6 +158,7 @@ function initGame(e){
     if(document.querySelector('#board')){
       document.querySelector('#board').remove();
       gameFlow.gameOver = false;
+      document.querySelector('#winner-text').remove();
     }
     gameBoard.createBoard();
 }

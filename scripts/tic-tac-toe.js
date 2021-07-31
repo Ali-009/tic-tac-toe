@@ -122,9 +122,13 @@ let gameFlow = (function(){
     wrapper.appendChild(winnerText);
 
     //mentioning current score
+    if(document.querySelector('#score-text')){
+      document.querySelector('#score-text').remove();
+    }
     let scoreText = document.createElement('div');
+    scoreText.setAttribute('id','score-text');
     scoreText.textContent = `${player1.name} : ${player1.score}
-    \n ${player2.name} : ${player2.score}`;
+    / ${player2.name} : ${player2.score}`;
 
     wrapper.appendChild(scoreText);
 
@@ -159,8 +163,27 @@ function initGame(e){
       document.querySelector('#board').remove();
       gameFlow.gameOver = false;
       document.querySelector('#winner-text').remove();
+      document.querySelector('#score-text').remove();
+      player1.score = 0;
+      player2.score = 0;
     }
     gameBoard.createBoard();
+
+    let retryButton = document.createElement('button');
+    retryButton.setAttribute('id', 'retry-button');
+    retryButton.textContent = 'Rematch';
+
+    retryButton.addEventListener('click', () => {
+
+      document.querySelector('#board').remove();
+      document.querySelector('#winner-text').remove();
+      gameFlow.gameOver = false;
+      gameBoard.createBoard();
+
+    });
+
+    let wrapper = document.querySelector('#wrapper');
+    wrapper.appendChild(retryButton);
 }
 
 startGame();

@@ -1,3 +1,9 @@
+//Player Factory Function
+
+function Player(sign){
+  let name = '';
+  return {name, sign}
+}
 
 //Modules
 
@@ -8,21 +14,30 @@ let gameBoard = (function(){
 
 let gameFlow = (function(){
 
+  let player1 = Player('X');
+  let player2 = Player('O');
+
   function startGame(){
     displayController.displayBoard();
     displayController.makeInteractive();
   }
 
-  let winningCombination = [];
+  let winnerLineIndices = [];
 
   function checkWinner(){
+
+    let filledCells = gameBoard.state.filter(cell => cell);
+
+    if(filledCells.length === 9){
+      displayController.endMatch();
+    }
 
     //horizontal lines
     for(let i = 0; i < 9; i = i + 3){
       if(gameBoard.state[i]){
         if(gameBoard.state[i] === gameBoard.state[i + 1] &&
           gameBoard.state[i] === gameBoard.state[i + 2]){
-            gameFlow.winningCombination = [i, i + 1, i + 2];
+            gameFlow.winnerLineIndices = [i, i + 1, i + 2];
         }
       }
     }
@@ -32,7 +47,7 @@ let gameFlow = (function(){
      if(gameBoard.state[i]){
        if(gameBoard.state[i] === gameBoard.state[i + 3] &&
          gameBoard.state[i] === gameBoard.state[i + 6]){
-           gameFlow.winningCombination = [i, i + 3, i + 6];
+           gameFlow.winnerLineIndices = [i, i + 3, i + 6];
        }
      }
    }
@@ -42,13 +57,17 @@ let gameFlow = (function(){
       if(gameBoard.state[0 + i]){
         if(gameBoard.state[0 + i] === gameBoard.state[4] &&
              gameBoard.state[0 + i] === gameBoard.state[8 - i]){
-          gameFlow.winningCombination = [0 + i, 4, 8 - i];
+          gameFlow.winnerLineIndices = [0 + i, 4, 8 - i];
         }
       }
     }
+
+    if(gameFlow.winnerLineIndices.length != 0){
+      displayController.endMatch();
+    }
   }
 
-  return {startGame, checkWinner, winningCombination};
+  return {startGame, player1, player2, checkWinner, winnerLineIndices};
 })();
 
 let displayController = (function(){
@@ -105,15 +124,42 @@ let displayController = (function(){
   }
 
   function endMatch(){
-
-  }
-
-  function _removeBoard(){
-
+    document.querySelector('#board').remove();
+    _displayForm();
+    _displayWinner();
   }
 
   function _displayForm(){
 
+    const form = document.createElement('div');
+    form.setAttribute('id', 'form-container');
+
+    const wrapper = document.querySelector('#wrapper');
+    wrapper.insertBefore(form, document.querySelector('#restart-button'));
+
+    const sign = ['X','O'];
+
+    //Creating input fields for two players
+    for(let i = 0; i < 2; i++){
+      const label = document.createElement('label');
+      label.setAttribute('for', `player${i+1}-name`);
+      label.textContent = `${sign[i]} Player: `
+
+      const input = document.createElement('input');
+      input.setAttribute('id', `player${i+1}-name`);
+      input.setAttribute('name', `player${i+1}-name`);
+
+      input.setAttribute('type', 'text');
+
+      form.appendChild(label);
+      form.appendChild(input);
+    }
+
+    const submitBtn = document.createElement('button');
+    submitBtn.setAttribute('id','submit-names');
+    submitBtn.textContent = 'Enter';
+
+    form.appendChild(submitBtn);
   }
 
   function _displayWinner(){
@@ -122,13 +168,5 @@ let displayController = (function(){
 
   return {displayBoard, makeInteractive, endMatch};
 })();
-
-//Player Factory Function
-
-function Player(){
-  let name = '';
-  let sign = '';
-  return {name, sign}
-}
 
 gameFlow.startGame();

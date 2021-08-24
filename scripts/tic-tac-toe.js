@@ -219,7 +219,7 @@ let displayController = (function(){
     gameResult.setAttribute('id', 'game-result');
 
     if(gameFlow.winnerLineIndices.length === 0){
-      gameResult.textContent = 'The game resulted in a tie';
+      gameResult.textContent = 'The game resulted in a tie.';
     }
 
     //Extracting the value on the winnerLineIndices

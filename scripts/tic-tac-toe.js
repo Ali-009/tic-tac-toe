@@ -8,10 +8,27 @@ let gameBoard = (function(){
 
 let gameFlow = (function(){
   function startGame(){
-
+    displayController.displayBoard();
+    displayController.makeInteractive();
   }
 
-  function storeValue(){
+  function storeValue(cell){
+    const cellID = cell.target.getAttribute('id');
+    const cellIndex = cellID.slice(5);
+
+    if(gameBoard.state[cellIndex]){
+      return;
+    }
+
+    //filtering for cells that were actually filled
+    filledCells = gameBoard.state.filter(cell => cell);
+
+    //deciding turn based on how many cells were actually filled
+    if(filledCells.length % 2 === 0){
+      gameBoard.state[cellIndex] = 'x';
+    } else{
+      gameBoard.state[cellIndex] = 'o';
+    }
 
   }
 
@@ -26,8 +43,8 @@ let displayController = (function(){
 
   function displayBoard(){
 
-    let wrapper = document.querySelector('#wrapper');
-    let board = document.createElement('div');
+    const wrapper = document.querySelector('#wrapper');
+    const board = document.createElement('div');
 
     //inserting the board
     console.log(wrapper.lastChild);
@@ -36,7 +53,7 @@ let displayController = (function(){
 
     //creating cells within the board
     for(let i = 0; i < 9; i++){
-      let boardCell = document.createElement('div');
+      const boardCell = document.createElement('div');
       boardCell.classList.add('board-cell');
       boardCell.setAttribute('id', `cell-${i}`);
 
@@ -50,8 +67,18 @@ let displayController = (function(){
     }
   }
 
-  function addEventListeners(){
+  function updateBoard(cell){
 
+  }
+
+  function makeInteractive(){
+    const boardCells = document.querySelectorAll('.board-cell');
+
+    boardCells.forEach(cell => cell.addEventListener('click',
+      (e) => {
+        gameFlow.storeValue(e);
+        displayController.updateBoard(e);
+      }));
   }
 
   function endMatch(){
@@ -70,7 +97,7 @@ let displayController = (function(){
 
   }
 
-  return {displayBoard, addEventListeners, endMatch};
+  return {displayBoard, updateBoard, makeInteractive, endMatch};
 })();
 
 //Player Factory Function
@@ -81,4 +108,4 @@ function Player(){
   return {name, sign}
 }
 
-displayController.displayBoard();
+gameFlow.startGame();

@@ -13,11 +13,42 @@ let gameFlow = (function(){
     displayController.makeInteractive();
   }
 
+  let winningCombination = [];
+
   function checkWinner(){
 
+    //horizontal lines
+    for(let i = 0; i < 9; i = i + 3){
+      if(gameBoard.state[i]){
+        if(gameBoard.state[i] === gameBoard.state[i + 1] &&
+          gameBoard.state[i] === gameBoard.state[i + 2]){
+            gameFlow.winningCombination = [i, i + 1, i + 2];
+        }
+      }
+    }
+
+    //vertical lines
+    for(let i = 0; i < 3; i++){
+     if(gameBoard.state[i]){
+       if(gameBoard.state[i] === gameBoard.state[i + 3] &&
+         gameBoard.state[i] === gameBoard.state[i + 6]){
+           gameFlow.winningCombination = [i, i + 3, i + 6];
+       }
+     }
+   }
+
+    //diagnol rewritten
+    for(let i = 0; i <= 2; i = i + 2){
+      if(gameBoard.state[0 + i]){
+        if(gameBoard.state[0 + i] === gameBoard.state[4] &&
+             gameBoard.state[0 + i] === gameBoard.state[8 - i]){
+          gameFlow.winningCombination = [0 + i, 4, 8 - i];
+        }
+      }
+    }
   }
 
-  return {startGame, checkWinner};
+  return {startGame, checkWinner, winningCombination};
 })();
 
 let displayController = (function(){
@@ -69,6 +100,8 @@ let displayController = (function(){
     //updating the array and the display
     gameBoard.state[cellIndex] = cellValue;
     e.target.textContent = cellValue;
+
+    gameFlow.checkWinner();
   }
 
   function endMatch(){

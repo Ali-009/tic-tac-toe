@@ -17,12 +17,18 @@ let gameFlow = (function(){
   let player1 = Player('X');
   let player2 = Player('O');
 
+  let winnerLineIndices = [];
+
   function startGame(){
+
+    if(gameBoard.state.length > 0){
+      gameBoard.state = [];
+      gameFlow.winnerLineIndices = [];
+    }
+
     displayController.displayBoard();
     displayController.makeInteractive();
   }
-
-  let winnerLineIndices = [];
 
   function checkWinner(){
 
@@ -94,6 +100,17 @@ let displayController = (function(){
       if(i === 6 || i === 7 || i === 8){
         boardCell.style.borderBottom = 'none';
       }
+
+      boardCell.textContent = gameBoard.state[i];
+    }
+
+    //show winning combination
+    if(gameFlow.winnerLineIndices.length != 0){
+      for(let i = 0; i < 3; i++){
+          const boardCell =
+              document.querySelector(`#cell-${gameFlow.winnerLineIndices[i]}`);
+          boardCell.style.color = 'red';
+      }
     }
   }
 
@@ -102,6 +119,27 @@ let displayController = (function(){
 
     boardCells.forEach(cell => cell.addEventListener('click',
         _handleClickEvent));
+
+    const restartBtn = document.querySelector('#restart-button');
+    restartBtn.addEventListener('click', _restartGame);
+  }
+
+  function _restartGame(e){
+    const board = document.querySelector('#board');
+    const form = document.querySelector('#form-container');
+    const gameResult = document.querySelector('#game-result');
+
+    if(board){
+      board.remove();
+    }
+    if(form){
+      form.remove();
+    }
+    if(gameResult){
+      gameResult.remove();
+    }
+
+    gameFlow.startGame();
   }
 
   function _handleClickEvent(e){
@@ -126,7 +164,6 @@ let displayController = (function(){
   function endMatch(){
     document.querySelector('#board').remove();
     _displayForm();
-    _displayWinner();
   }
 
   function _displayForm(){
@@ -159,11 +196,47 @@ let displayController = (function(){
     submitBtn.setAttribute('id','submit-names');
     submitBtn.textContent = 'Enter';
 
+    submitBtn.addEventListener('click', _submitNames);
+
     form.appendChild(submitBtn);
   }
 
-  function _displayWinner(){
+  function _submitNames(e){
+    gameFlow.player1.name =
+        document.querySelector('#player1-name').value;
+    gameFlow.player2.name =
+        document.querySelector('#player2-name').value;
 
+    document.querySelector('#form-container').remove();
+    displayBoard();
+    _displayWinner();
+  }
+
+  function _displayWinner(){
+    const wrapper = document.querySelector('#wrapper');
+    const gameResult = document.createElement('p');
+
+    gameResult.setAttribute('id', 'game-result');
+
+    if(gameFlow.winnerLineIndices.length === 0){
+      gameResult.textContent = 'The game resulted in a tie';
+    }
+
+    //Extracting the value on the winnerLineIndices
+    let winnerSign = gameBoard.state[gameFlow.winnerLineIndices[0]];
+
+    if(winnerSign === 'X'){
+      gameResult.textContent =
+          `Congratulations ${gameFlow.player1.name}! You won.`;
+    } else if(winnerSign === 'O'){
+      gameResult.textContent =
+          `Congratulations ${gameFlow.player2.name}! You won.`
+    }
+
+    gameResult.style.marginTop = '30px';
+
+    wrapper.insertBefore(gameResult,
+          document.querySelector('#restart-button'));
   }
 
   return {displayBoard, makeInteractive, endMatch};

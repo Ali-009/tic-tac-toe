@@ -7,36 +7,17 @@ let gameBoard = (function(){
 })();
 
 let gameFlow = (function(){
+
   function startGame(){
     displayController.displayBoard();
     displayController.makeInteractive();
-  }
-
-  function storeValue(cell){
-    const cellID = cell.target.getAttribute('id');
-    const cellIndex = cellID.slice(5);
-
-    if(gameBoard.state[cellIndex]){
-      return;
-    }
-
-    //filtering for cells that were actually filled
-    filledCells = gameBoard.state.filter(cell => cell);
-
-    //deciding turn based on how many cells were actually filled
-    if(filledCells.length % 2 === 0){
-      gameBoard.state[cellIndex] = 'x';
-    } else{
-      gameBoard.state[cellIndex] = 'o';
-    }
-
   }
 
   function checkWinner(){
 
   }
 
-  return {startGame, storeValue, checkWinner};
+  return {startGame, checkWinner};
 })();
 
 let displayController = (function(){
@@ -47,7 +28,6 @@ let displayController = (function(){
     const board = document.createElement('div');
 
     //inserting the board
-    console.log(wrapper.lastChild);
     wrapper.insertBefore(board, document.querySelector('#restart-button'));
     board.setAttribute('id','board');
 
@@ -67,37 +47,47 @@ let displayController = (function(){
     }
   }
 
-  function updateBoard(cell){
-
-  }
-
   function makeInteractive(){
     const boardCells = document.querySelectorAll('.board-cell');
 
     boardCells.forEach(cell => cell.addEventListener('click',
-      (e) => {
-        gameFlow.storeValue(e);
-        displayController.updateBoard(e);
-      }));
+        _handleClickEvent));
+  }
+
+  function _handleClickEvent(e){
+    const cellID = e.target.getAttribute('id');
+    const cellIndex = cellID.slice(5);
+
+    if(gameBoard.state[cellIndex]){
+      return;
+    }
+
+    //deciding turn based on how many cells were actually filled
+    let filledCells = gameBoard.state.filter(cell => cell);
+    let cellValue = filledCells.length % 2 === 0 ? 'X' : 'O';
+
+    //updating the array and the display
+    gameBoard.state[cellIndex] = cellValue;
+    e.target.textContent = cellValue;
   }
 
   function endMatch(){
 
   }
 
-  function removeBoard(){
+  function _removeBoard(){
 
   }
 
-  function displayForm(){
+  function _displayForm(){
 
   }
 
-  function displayWinner(){
+  function _displayWinner(){
 
   }
 
-  return {displayBoard, updateBoard, makeInteractive, endMatch};
+  return {displayBoard, makeInteractive, endMatch};
 })();
 
 //Player Factory Function

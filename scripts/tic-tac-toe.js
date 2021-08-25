@@ -1,12 +1,12 @@
 //Player Factory Function
-
 function Player(sign){
   let name = '';
   return {name, sign}
 }
+/*Player and gameBoard only hold data. Operations are done using the
+gameFlow and displayController modules*/
 
 //Modules
-
 let gameBoard = (function(){
   let state = [];
   return {state};
@@ -21,6 +21,8 @@ let gameFlow = (function(){
 
   function startGame(){
 
+    /*startGame() is also used in _restartGame(), therefore
+    it is necessary to clear gameBoard.state and gameFlow.winnerLineIndices*/
     if(gameBoard.state.length > 0){
       gameBoard.state = [];
       gameFlow.winnerLineIndices = [];
@@ -31,14 +33,15 @@ let gameFlow = (function(){
   }
 
   function checkWinner(){
-
+    /*Ending the match if all the cells are filled.
+    The function doesn't return after this step because a winning line
+    still needs to be checked for*/
     let filledCells = gameBoard.state.filter(cell => cell);
-
     if(filledCells.length === 9){
       displayController.endMatch();
     }
 
-    //horizontal lines
+    //checking horizontal lines
     for(let i = 0; i < 9; i = i + 3){
       if(gameBoard.state[i]){
         if(gameBoard.state[i] === gameBoard.state[i + 1] &&
@@ -48,7 +51,7 @@ let gameFlow = (function(){
       }
     }
 
-    //vertical lines
+    //checking vertical lines
     for(let i = 0; i < 3; i++){
      if(gameBoard.state[i]){
        if(gameBoard.state[i] === gameBoard.state[i + 3] &&
@@ -58,7 +61,7 @@ let gameFlow = (function(){
      }
    }
 
-    //diagnol rewritten
+    //checking diagonal lines
     for(let i = 0; i <= 2; i = i + 2){
       if(gameBoard.state[0 + i]){
         if(gameBoard.state[0 + i] === gameBoard.state[4] &&
@@ -113,7 +116,9 @@ let displayController = (function(){
       }
     }
   }
-
+  /*Adds event listeners where needed. This is separated from displayBoard()
+  to have the option of creating non-interactive game boards that display
+  the board state after the match is over*/
   function makeInteractive(){
     const boardCells = document.querySelectorAll('.board-cell');
 
@@ -124,6 +129,8 @@ let displayController = (function(){
     restartBtn.addEventListener('click', _restartGame);
   }
 
+  /*removes the HTML elements, and calls gmaeFlow.startGame() to
+  start a game with a new board*/
   function _restartGame(e){
     const board = document.querySelector('#board');
     const form = document.querySelector('#form-container');
@@ -141,7 +148,7 @@ let displayController = (function(){
 
     gameFlow.startGame();
   }
-
+  //Handles click events on cells
   function _handleClickEvent(e){
     const cellID = e.target.getAttribute('id');
     const cellIndex = cellID.slice(5);
@@ -165,7 +172,8 @@ let displayController = (function(){
     document.querySelector('#board').remove();
     _displayForm();
   }
-
+  /*After the match ends, creates a form where players can input their names,
+  afterwhich the winner is displayed*/
   function _displayForm(){
 
     const form = document.createElement('div');
@@ -241,5 +249,5 @@ let displayController = (function(){
 
   return {displayBoard, makeInteractive, endMatch};
 })();
-
+//Starts the game in the global scope
 gameFlow.startGame();
